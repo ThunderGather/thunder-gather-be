@@ -11,6 +11,7 @@ import com.team.thundergather.global.auth.jwt.dto.RefreshTokenDto;
 import com.team.thundergather.global.auth.jwt.dto.TokenDto;
 import com.team.thundergather.global.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +106,18 @@ public class MemberService {
         response.addCookie(cookie);
 
         return tokenDto.accessTokenDto();
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        // Refresh Token 쿠키 조회
+        final String refreshToken = CookieUtils.getCookieValue(request.getCookies(), TokenName.USER_REFRESH_TOKEN.name());
+
+        // Redis에 저장된 Refresh Token 삭제
+        redisTemplate.delete(refreshToken);
+
+        // Refresh Token 쿠키 삭제
+        Cookie cookie = CookieUtils.getCookieForRemove(TokenName.USER_REFRESH_TOKEN.name());
+        response.addCookie(cookie);
     }
 
     // 파일을 로컬 디렉토리에 저장
