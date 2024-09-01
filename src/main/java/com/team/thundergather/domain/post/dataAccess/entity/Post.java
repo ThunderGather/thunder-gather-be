@@ -26,14 +26,15 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
     @Column(nullable = false)
     @Comment("제목")
     private String title;
 
+    @Column(nullable = false)
+    @Comment("카테고리")
+    private String category;
+
+    /* ----------------------------------------- */
     @Column(nullable = false)
     @Comment("날짜")
     private String desiredDate;
@@ -42,10 +43,7 @@ public class Post extends BaseEntity {
     @Comment("시간")
     private String desiredTime;
 
-    @Column(nullable = false)
-    @Comment("카테고리")
-    private String category;
-
+    /* ----------------------------------------- */
     @Column(nullable = false)
     @Comment("참여 최대 인원")
     private int maxParticipants;
@@ -61,6 +59,12 @@ public class Post extends BaseEntity {
     @Comment("오픈 채팅방 URL")
     private String openChatUrl;
 
+    /* ----------------------------------------- */
+    @ManyToOne(optional = false)
+    @Comment("모임장 id")
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants = new ArrayList<>();
 
@@ -69,9 +73,9 @@ public class Post extends BaseEntity {
                 String description, String location, String openChatUrl) {
         this.member = member;
         this.title = title;
+        this.category = category;
         this.desiredDate = desiredDate;
         this.desiredTime = desiredTime;
-        this.category = category;
         this.maxParticipants = maxParticipants;
         this.description = description;
         this.location = location;
@@ -81,8 +85,8 @@ public class Post extends BaseEntity {
     public static Post of(PostCreateDTO dto, Member member) {
         return Post.builder()
                 .member(member)
-                .category(dto.getCategory())
                 .title(dto.getTitle())
+                .category(dto.getCategory())
                 .desiredDate(dto.getDesiredDate())
                 .desiredTime(dto.getDesiredTime())
                 .maxParticipants(dto.getMaxParticipants())
@@ -93,8 +97,8 @@ public class Post extends BaseEntity {
     }
 
     public void update(PostUpdateDTO dto) {
-        this.category = dto.getCategory();
         this.title = dto.getTitle();
+        this.category = dto.getCategory();
         this.desiredDate = dto.getDesiredDate();
         this.desiredTime = dto.getDesiredTime();
         this.maxParticipants = dto.getMaxParticipants();

@@ -6,7 +6,6 @@ import com.team.thundergather.domain.post.applicaion.dto.PostResponseDTO;
 import com.team.thundergather.domain.post.applicaion.dto.PostUpdateDTO;
 import com.team.thundergather.domain.post.dataAccess.entity.Post;
 import com.team.thundergather.domain.post.dataAccess.repository.PostRepository;
-import com.team.thundergather.domain.participant.dataAccess.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,99 +19,63 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final ParticipantRepository participantRepository;
 
-    // 모든 게시글 조회
+    // 모든 번개 리스트 불러오기
     @Transactional(readOnly = true)
     public List<PostResponseDTO> getAllPosts() {
-        return postRepository.findAll().stream()
-                .map(this::mapToResponseDTO)
+        List<Post> posts = postRepository.findAll();
+        return posts.stream()
+                .map(PostResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // 게시글 생성
+    // 번개 생성
     @Transactional
     public PostResponseDTO createPost(PostCreateDTO postCreateDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + memberId + ")의 사용자를 찾을 수 없습니다."));
 
         Post post = Post.of(postCreateDTO, member);
-        Post savedPost = postRepository.save(post);
-        return mapToResponseDTO(savedPost);
+        postRepository.save(post);
+
+        return new PostResponseDTO(post);
     }
 
-    // 개별 게시글 조회
+    // 번개 정보 불러오기
     @Transactional(readOnly = true)
     public PostResponseDTO getPostById(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID: " + postId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + postId + ")의 번개를 찾을 수 없습니다."));
 
-        return mapToDetailedResponseDTO(post);
+        return new PostResponseDTO(post);
     }
 
-    // 게시글 수정
+    // 번개 수정
     @Transactional
-    public PostResponseDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO) {
+    public PostResponseDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO, Long memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID: " + postId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + postId + "의 번개를 찾을 수 없습니다."));
+
+        // 작성자 확인
+        if (!post.getMember().getId().equals(memberId)) {
+            throw new IllegalStateException("해당 번개를 수정할 권한이 없습니다.");
+        }
 
         post.update(postUpdateDTO);
-        Post updatedPost = postRepository.save(post);
-        return mapToResponseDTO(updatedPost);
+        return new PostResponseDTO(post);
     }
 
-    // 게시글 삭제
+    // 번개 삭제
     @Transactional
-    public void deletePost(Long postId) {
-        postRepository.deleteById(postId);
-    }
+    public void deletePost(Long postId, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + postId + ")의 번개를 찾을 수 없습니다."));
 
-    // 모든 게시글 조회용 DTO 매핑
-    private PostResponseDTO mapToResponseDTO(Post post) {
-        return PostResponseDTO.builder()
-                .postId(post.getId())
-                .memberId(post.getMember().getId())
-                .memberEmail(post.getMember().getEmail())
-                .title(post.getTitle())
-                .desiredDate(post.getDesiredDate())
-                .desiredTime(post.getDesiredTime())
-                .category(post.getCategory())
-                .maxParticipants(post.getMaxParticipants())
-                .description(post.getDescription())
-                .location(post.getLocation())
-                .openChatUrl(post.getOpenChatUrl())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .participants(post.getParticipants().stream()
-                        .map(participant -> new PostResponseDTO.ParticipantDTO(
-                                participant.getMember().getId(),
-                                participant.getMember().getNickname(),
-                                participant.getMember().getProfileImage()))
-                        .collect(Collectors.toList()))
-                .build();
-    }
+        // 작성자 확인
+        if (!post.getMember().getId().equals(memberId)) {
+            throw new IllegalStateException("해당 번개를 삭제할 권한이 없습니다.");
+        }
 
-    // 개별 게시글 상세 조회용 DTO 매핑
-    private PostResponseDTO mapToDetailedResponseDTO(Post post) {
-        return PostResponseDTO.builder()
-                .postId(post.getId())
-                .title(post.getTitle())
-                .desiredDate(post.getDesiredDate())
-                .desiredTime(post.getDesiredTime())
-                .category(post.getCategory())
-                .maxParticipants(post.getMaxParticipants())
-                .description(post.getDescription())
-                .location(post.getLocation())
-                .openChatUrl(post.getOpenChatUrl())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .participants(post.getParticipants().size())
-                .members(post.getParticipants().stream()
-                        .map(participant -> new PostResponseDTO.MemberDTO(
-                                participant.getMember().getNickname(),
-                                participant.getMember().getProfileImage(),
-                                participant.getMember().equals(post.getMember())))
-                        .collect(Collectors.toList()))
-                .build();
+        postRepository.delete(post);
     }
 }

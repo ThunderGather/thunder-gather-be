@@ -18,18 +18,20 @@ import java.util.stream.Collectors;
 public class ParticipantService {
 
     private final ParticipantRepository participantRepository;
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
+
 
     // 내가 참여한 번개 목록 조회
     @Transactional(readOnly = true)
     public List<PostResponseDTO> getMyMeetings(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + memberId + ")의 사용자를 찾을 수 없습니다."));
 
-        return participantRepository.findByMember(member).stream()
-                .map(Participant::getPost)
-                .map(this::mapToResponseDTO)
+        List<Participant> participants = participantRepository.findByMember(member);
+
+        return participants.stream()
+                .map(participant -> new PostResponseDTO(participant.getPost()))
                 .collect(Collectors.toList());
     }
 
@@ -37,13 +39,13 @@ public class ParticipantService {
     @Transactional
     public void joinMeeting(Long postId, Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + memberId + ")의 사용자를 찾을 수 없습니다."));
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID: " + postId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + postId + ")의 번개를 찾을 수 없습니다."));
 
-        if (participantRepository.existsByMemberAndPost(member, post)) {
-            throw new IllegalArgumentException("Already joined the meeting");
+        if (participantRepository.findByPostAndMember(post, member).isPresent()) {
+            throw new IllegalStateException("당신은 이미 이 번개에 참여했습니다.");
         }
 
         Participant participant = new Participant(member, post);
@@ -54,39 +56,14 @@ public class ParticipantService {
     @Transactional
     public void cancelMeeting(Long postId, Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + memberId + ")의 사용자를 찾을 수 없습니다."));
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID: " + postId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + memberId + ")의 번개를 찾을 수 없습니다."));
 
-        Participant participant = participantRepository.findByMemberAndPost(member, post)
-                .orElseThrow(() -> new IllegalArgumentException("Not participating in the meeting"));
+        Participant participant = participantRepository.findByPostAndMember(post, member)
+                .orElseThrow(() -> new IllegalArgumentException("당신은 이 번개의 참가자가 아닙니다."));
 
         participantRepository.delete(participant);
-    }
-
-    // DTO
-    private PostResponseDTO mapToResponseDTO(Post post) {
-        return PostResponseDTO.builder()
-                .postId(post.getId())
-                .memberId(post.getMember().getId())
-                .memberEmail(post.getMember().getEmail())
-                .title(post.getTitle())
-                .desiredDate(post.getDesiredDate())
-                .desiredTime(post.getDesiredTime())
-                .category(post.getCategory())
-                .maxParticipants(post.getMaxParticipants())
-                .description(post.getDescription())
-                .location(post.getLocation())
-                .openChatUrl(post.getOpenChatUrl())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .participants(post.getParticipants().stream()
-                        .map(participant -> new PostResponseDTO.ParticipantDTO(
-                                participant.getMember().getId(),
-                                participant.getMember().getNickname(),
-                                participant.getMember().getProfileImage()))
-                        .collect(Collectors.toList()))
-                .build();
     }
 }

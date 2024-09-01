@@ -1,44 +1,30 @@
 package com.team.thundergather.domain.post.applicaion.dto;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import com.team.thundergather.domain.post.dataAccess.entity.Post;
+import lombok.Getter;
 
 @Getter
-@NoArgsConstructor
 public class PostResponseDTO {
 
-    private Long postId;
-    private Long memberId;
-    private String memberEmail;
-    private String title;
-    private String desiredDate;
-    private String desiredTime;
-    private String category;
-    private int maxParticipants;
-    private String description;
-    private String location;
-    private String openChatUrl;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final Long id;
+    private final String title;
+    private final String category;
+    private final String desiredDate;
+    private final String desiredTime;
+    private final int maxParticipants;
+    private final String description;
+    private final String location;
+    private final String openChatUrl;
 
-    @Builder
-    public PostResponseDTO(Long postId, Long memberId, String memberEmail, String title, String desiredDate,
-                           String desiredTime, String category, int maxParticipants, String description,
-                           String location, String openChatUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.postId = postId;
-        this.memberId = memberId;
-        this.memberEmail = memberEmail;
-        this.title = title;
-        this.desiredDate = desiredDate;
-        this.desiredTime = desiredTime;
-        this.category = category;
-        this.maxParticipants = maxParticipants;
-        this.description = description;
-        this.location = location;
-        this.openChatUrl = openChatUrl;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public PostResponseDTO(Post post) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.category = post.getCategory();
+        this.desiredDate = post.getDesiredDate();
+        this.desiredTime = post.getDesiredTime();
+        this.maxParticipants = post.getMaxParticipants();
+        this.description = post.getDescription();
+        this.location = post.getLocation();
+        this.openChatUrl = post.getOpenChatUrl();
     }
 }

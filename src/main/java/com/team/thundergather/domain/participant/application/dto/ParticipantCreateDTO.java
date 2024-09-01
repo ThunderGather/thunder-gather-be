@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class ParticipantCreateDTO {
 
-    @NotNull(message = "회원 ID는 null일 수 없습니다.")
+    @NotNull(message = "참가자 ID는 null일 수 없습니다.")
     private final Long memberId;
 
     @NotNull(message = "번개 모임 ID는 null일 수 없습니다.")

@@ -85,7 +85,12 @@ public class MemberService {
         }
 
         // Authentication 객체 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(savedMember.getEmail(), savedMember.getPassword(), Collections.singletonList(Role.ROLE_USER::name));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                savedMember.getId(), // User Id
+                savedMember.getPassword(),
+                Collections.singletonList(Role.ROLE_USER::name
+            )
+        );
 
         // 인증 정보를 기반으로 JWT Token 생성
         TokenDto tokenDto = jwtTokenProvider.generateToken(authentication);
