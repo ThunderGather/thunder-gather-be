@@ -65,8 +65,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPONAME }}:${{ github.sha }} 
-            docker stop ${{ secrets.DOCKER_REPONAME }} || true  
-            docker rm ${{ secrets.DOCKER_REPONAME }} || true 
             docker run -d -p 5000:8080 --name ${{ secrets.DOCKER_REPONAME }} \
               -v ~/app/config/application.yml:/app/application.yml \
               -e FILE_UPLOAD_DIR=/app/static \
