@@ -1,8 +1,10 @@
 package com.team.thundergather.domain.member.dataAccess.entity;
 
 import com.team.thundergather.config.db.BaseEntity;
+import com.team.thundergather.domain.member.application.dto.MemberCreateDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,4 +34,24 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image")
     @Comment("프로필 사진")
     private String profileImage;
+
+    @Builder
+    public Member(String email, String password, String nickname, String image) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.profileImage = image;
+    }
+
+    public static Member of(MemberCreateDTO dto) {
+        return Member.builder()
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .nickname(dto.getNickname())
+                .build();
+    }
+
+    public void addProfileImage(String imagePath) {
+        this.profileImage = imagePath;
+    }
 }
