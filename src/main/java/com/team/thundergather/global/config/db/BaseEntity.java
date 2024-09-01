@@ -1,4 +1,4 @@
-package com.team.thundergather.config.db;
+package com.team.thundergather.global.config.db;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

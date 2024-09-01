@@ -1,5 +1,5 @@
 package com.team.thundergather.domain.post.dataAccess.entity;
-import com.team.thundergather.config.db.BaseEntity;
+import com.team.thundergather.global.config.db.BaseEntity;
 import com.team.thundergather.domain.member.dataAccess.entity.Member;
 import com.team.thundergather.domain.participant.dataAccess.entity.Participant;
 import jakarta.persistence.*;
