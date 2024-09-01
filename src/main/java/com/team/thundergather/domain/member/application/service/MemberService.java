@@ -12,6 +12,7 @@ import com.team.thundergather.global.auth.jwt.dto.RefreshTokenDto;
 import com.team.thundergather.global.auth.jwt.dto.TokenDto;
 import com.team.thundergather.global.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +88,7 @@ public class MemberService {
         }
 
         // Authentication 객체 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(savedMember.getEmail(), savedMember.getPassword(), Collections.singletonList(Role.ROLE_USER::name));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(savedMember.getId(), savedMember.getPassword(), Collections.singletonList(Role.ROLE_USER::name));
 
         // 인증 정보를 기반으로 JWT Token 생성
         TokenDto tokenDto = jwtTokenProvider.generateToken(authentication);
@@ -102,6 +103,18 @@ public class MemberService {
         response.addCookie(cookie);
 
         return tokenDto.accessTokenDto();
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        // Refresh Token 쿠키 조회
+        final String refreshToken = CookieUtils.getCookieValue(request.getCookies(), TokenName.USER_REFRESH_TOKEN.name());
+
+        // Redis에 저장된 Refresh Token 삭제
+        redisTemplate.delete(refreshToken);
+
+        // Refresh Token 쿠키 삭제
+        Cookie cookie = CookieUtils.getCookieForRemove(TokenName.USER_REFRESH_TOKEN.name());
+        response.addCookie(cookie);
     }
 
     // 파일을 로컬 디렉토리에 저장
