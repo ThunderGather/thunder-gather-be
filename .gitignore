@@ -8,7 +8,7 @@
 .idea
 application-my.yml
 application-dev.yml
-application.yml
+src/main/resources/application.yml
 
 # Ignore TravelDayFirebaseService.json
 src/main/resources/properties/TravelDayFirebaseService.json
