@@ -1,5 +1,4 @@
 package com.team.thundergather.domain.member.application.dto;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;

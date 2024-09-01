@@ -1,5 +1,4 @@
 package com.team.thundergather.domain.member.application.controller;
-
 import com.team.thundergather.domain.member.application.dto.MemberCreateDTO;
 import com.team.thundergather.domain.member.application.service.MemberService;
 import lombok.RequiredArgsConstructor;

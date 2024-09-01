@@ -1,14 +1,12 @@
 package com.team.thundergather.domain.member.dataAccess.entity;
-
 import com.team.thundergather.config.db.BaseEntity;
 import com.team.thundergather.domain.member.application.dto.MemberCreateDTO;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)

@@ -1,5 +1,4 @@
 package com.team.thundergather.domain.member.application.service;
-
 import com.team.thundergather.domain.member.application.dto.MemberCreateDTO;
 import com.team.thundergather.domain.member.dataAccess.entity.Member;
 import com.team.thundergather.domain.member.dataAccess.repository.MemberRepository;
@@ -15,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-
 
 @Service
 @RequiredArgsConstructor
