@@ -12,7 +12,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
 
                 // Frontend
-                .allowedOrigins("http://localhost:3000",
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:5173",
+                        "https://thundergather.kro.kr",
                         "https://main--beo-gather.netlify.app"
                 )
 
